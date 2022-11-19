@@ -26,16 +26,22 @@ rm -r node_modules # IMPORTANT to not skip this cleanup step
 import React, { Suspense } from 'react'
 import { Spinner } from '@preaction/bootstrap-clips'
 import OpenPGP from './blockext-openpgp/dist/preactioncms-blockext-openpgp.esm.js'
-OpenPGPSettings = loadable(
+const OpenPGPSettings = React.lazy(
   () =>
     import(
       './blockext-openpgp/dist/preactioncms-blockext-openpgp-settings.esm.js'
-    ),
-  {
-    fallback: <Spinner />,
-  }
+    )
 )
-OpenPGP.Settings = OpenPGPSettings
+const blockExtensionSettings = {
+  OpenPGPSettings: function (props) {
+    return (
+      <Suspense fallback={<Spinner />}>
+        <OpenPGPSettings {...props} />
+      </Suspense>
+    )
+  }
+}
+OpenPGP.Settings = blockExtensionSettings.OpenPGPSettings
 const blockExtensions = { OpenPGP }
 // ...
 ```
